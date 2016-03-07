@@ -78,7 +78,6 @@ var TodoApp = React.createClass({
 
 		var unfinishedTodos = this.getUnfinishedTodos(todoList);
 		var count = unfinishedTodos.length;
-
 		this.setState({
 			todoList: todoList,
 			completeAll: this.checkCompleteAll(todoList),
@@ -310,15 +309,57 @@ var TodoItem = React.createClass({
 	},
 
 	componentDidUpdate: function() {
-		var el = React.findDOMNode(this.refs.inputEditTodo);
-		el.value = el.value;
-		el.focus();
+		if (React.findDOMNode(this.refs.inputEditTodo)) {
+			var el = React.findDOMNode(this.refs.inputEditTodo);
+			el.value = el.value;
+			el.focus();
+		};
 	},
 
 	render: function() {
 		var classString = this.props.todo.editing ? 'editing' : '';
 		if (this.props.todo.complete) {
 			classString += ' completed'
+		}
+		if (!this.props.todo.editing) {
+			return (
+				<li className={classString}>
+				<div className="view">
+					<input
+						type="checkbox"
+						checked={this.props.todo.complete}
+						onChange={this.props.handleChangeComplete}
+						className="toggle"
+					 />
+					 <label
+					 	onDoubleClick={this.props.handleShowEdit}
+					 	className="view"
+					 >
+					 	{this.props.todo.name}
+					 </label>
+					 <button 
+					 	type="button"
+					 	onClick={this.props.handleRemoveTodo}
+					 	className="destroy"
+					 ></button>
+				</div>
+			</li>
+			)
+		} else {
+			return (
+				<li className={classString}>
+				 <input 
+				 	type="text"
+						defaultValue = {
+							this.props.todo.name
+						}
+				 	onKeyDown={this.handleOnKeyDown}
+				 	onBlur={this.handleSubmit}
+				 	ref="inputEditTodo"
+				 	className="edit"
+				 />
+			</li>
+			)
 		}
 		return (
 			<li className={classString}>
@@ -343,7 +384,9 @@ var TodoItem = React.createClass({
 				</div>
 				 <input 
 				 	type="text"
-				 	defaultValue={this.props.todo.name}
+						defaultValue = {
+							this.props.todo.name
+						}
 				 	onKeyDown={this.handleOnKeyDown}
 				 	onBlur={this.handleSubmit}
 				 	ref="inputEditTodo"
